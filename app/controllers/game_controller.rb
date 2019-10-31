@@ -1,6 +1,9 @@
 class GameController < ActionController::API
 
+  before_action :authenticate_user!
+
   def create
+    binding.pry
     player_names = params[:player_names]
 
     game = Game.new(player_names)
