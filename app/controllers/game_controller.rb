@@ -1,4 +1,5 @@
 class GameController < ActionController::API
+  include Secured
 
   def create
     player_names = params[:player_names]
