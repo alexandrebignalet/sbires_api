@@ -1,13 +1,10 @@
 class GameController < ActionController::API
 
-  before_action :authenticate_user!
-
   def create
-    binding.pry
     player_names = params[:player_names]
 
-    game = Game.new(player_names)
-    GamePersistence.add(game)
+    command = CreateGame.new(player_names)
+    game = CreateGameHandler.new.call command
 
     render json: GameSerializer.new(game), status: :ok
   end

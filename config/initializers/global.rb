@@ -1,1 +1,0 @@
-GamePersistence = GameRepository.new
