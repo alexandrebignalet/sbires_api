@@ -1,0 +1,1 @@
+class WaitingRoomRepository < InMemoryRepository; end

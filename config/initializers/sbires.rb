@@ -2,8 +2,6 @@
 
 require 'sbires'
 
-GamePersistence = GameRepository.new
-
 Sbires.configure do |config|
-  config.game_repository = GamePersistence
+  config.game_repository = Repositories.get('GameRepository')
 end
