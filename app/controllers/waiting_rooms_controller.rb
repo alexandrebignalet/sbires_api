@@ -1,14 +1,17 @@
+# frozen_string_literal: true
+
 class WaitingRoomsController < ActionController::API
   include Secured
 
   def create
     room_name = params[:name]
 
-    room = WaitingRoom.new(name: room_name, user_ids: [current_user.auth_id])
-    repository.add(room)
-    UserWaitingRoom.create!(user: current_user, waiting_room_id: room.id)
+    repository = Repositories.get('WaitingRoomRepository')
+    waiting_room = WaitingRoom::Create
+                   .new(repository)
+                   .call(name: room_name, current_user: current_user)
 
-    render json: WaitingRoomSerializer.new(room), status: :created
+    render json: WaitingRoomSerializer.new(waiting_room), status: :created
   end
 
   def show

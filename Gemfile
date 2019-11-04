@@ -10,6 +10,7 @@ gem 'puma', '~> 3.11'
 gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'sbires', path: '../sbires_core'
+
 gem 'jwt'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-cors','~>0.4.1'

@@ -24,4 +24,5 @@ RSpec.describe WaitingRoomsController, type: :request do
     expect(response.parsed_body['name']).to eq(waiting_room_name)
     expect(response.parsed_body['users']).to include(hash_including('id' => user.id, 'auth_id' => user.auth_id))
   end
+
 end
