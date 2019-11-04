@@ -12,7 +12,7 @@ RSpec.describe WaitingRoom::Create do
   let(:join_user) { User.create!(username: 'john', email: 'john@exmaple.org', auth_id: 'john_auth_id') }
 
   before do
-    @room = WaitingRoom::Create.new(repository).call(name: room_name, current_user: user)
+    @room = WaitingRoom::Create.new(repository).call(name: room_name, user_creator: user)
 
     WaitingRoom::Join.new(repository).call(waiting_room_id: @room.id, user: join_user)
   end

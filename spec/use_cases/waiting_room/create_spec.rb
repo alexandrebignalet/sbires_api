@@ -12,7 +12,7 @@ RSpec.describe WaitingRoom::Create do
     room_name = 'room_name'
     user = User.create!(username: 'jean', email: 'jean@exmaple.org', auth_id: 'auth_id')
 
-    created_room = WaitingRoom::Create.new(repository).call(name: room_name, current_user: user)
+    created_room = WaitingRoom::Create.new(repository).call(name: room_name, user_creator: user)
 
     expect(repository.load(created_room.id)).to eq(created_room)
     expect(created_room.name).to eq(room_name)
