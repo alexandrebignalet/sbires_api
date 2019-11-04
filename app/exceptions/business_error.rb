@@ -1,0 +1,1 @@
+class BusinessError < StandardError; end
