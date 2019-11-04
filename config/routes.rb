@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :game, only: [:show] do
     member do
       post :place_pawn
+      post :draw_card
     end
 
     collection do

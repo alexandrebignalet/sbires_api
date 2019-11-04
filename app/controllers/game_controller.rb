@@ -45,6 +45,21 @@ class GameController < ApplicationController
     head :no_content
   end
 
+  def draw_card
+    id = params[:id]
+    card_name = params[:card_name]
+    play = params[:play]
+    user_game = current_user.games.find_by!(game_id: id)
+
+    lord_name = user_game.lord_name
+    game = game_repository.load(id)
+    game.draw_card(lord_name, card_name, play)
+
+    game_repository.add(game)
+
+    head :no_content
+  end
+
   private
 
   def waiting_room_repository
