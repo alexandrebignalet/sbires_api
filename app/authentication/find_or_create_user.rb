@@ -2,7 +2,7 @@ require 'httparty'
 require 'uri'
 
 class FindOrCreateUser
-  def self.call(token)
+  def call(token)
     ActiveRecord::Base.transaction do
       decoded_token = JsonWebToken.verify(token)
 
@@ -15,7 +15,7 @@ class FindOrCreateUser
     end
   end
 
-  def self.create_user(token)
+  def create_user(token)
     user_info = user_info(token)
 
     User.create!(username: user_info["nickname"],
@@ -24,7 +24,7 @@ class FindOrCreateUser
   end
 
 
-  def self.user_info(token)
+  def user_info(token)
     url = URI("#{ENV['AUTH_0_ISS']}userinfo")
 
     headers = { Authorization: "Bearer #{token}" }

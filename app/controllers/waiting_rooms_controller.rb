@@ -8,7 +8,7 @@ class WaitingRoomsController < ActionController::API
     repository.add(room)
     UserWaitingRoom.create!(user: current_user, waiting_room_id: room.id)
 
-    render json: WaitingRoomSerializer.new(room), status: :ok
+    render json: WaitingRoomSerializer.new(room), status: :created
   end
 
   def show

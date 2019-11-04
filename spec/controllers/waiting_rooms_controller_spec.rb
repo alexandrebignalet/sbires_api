@@ -1,0 +1,27 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe WaitingRoomsController, type: :request do
+  def create_authenticated_user(username:, email:, auth_id:)
+    user = User.create!(username: username, email: email, auth_id: auth_id)
+    allow_any_instance_of(FindOrCreateUser).to receive(:call).and_return(user)
+    user
+  end
+
+  it 'should create a waiting room' do
+    waiting_room_resource_path = '/waiting_rooms'
+    user = create_authenticated_user(username: 'jean', email: 'jean@example.org', auth_id: 'user_auth_id')
+    waiting_room_name = 'waiting_room'
+
+    post waiting_room_resource_path, params: { name: waiting_room_name }
+
+    expect(response).to be_successful
+    expect(response.status).to be(201)
+    expect(response.parsed_body['name']).to eq(waiting_room_name)
+    expect(response.parsed_body['is_full']).to eq(false)
+    expect(response.parsed_body['can_start_game']).to eq(false)
+    expect(response.parsed_body['name']).to eq(waiting_room_name)
+    expect(response.parsed_body['users']).to include(hash_including('id' => user.id, 'auth_id' => user.auth_id))
+  end
+end

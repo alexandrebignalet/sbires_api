@@ -21,7 +21,7 @@ module Secured
   end
 
   def find_or_create_user
-    FindOrCreateUser.call(http_token)
+    FindOrCreateUser.new.call(http_token)
   end
 
   def current_user
