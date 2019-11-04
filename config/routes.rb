@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   root to: 'application#index'
 
-  resources :game, only: [:show] do
+  resources :games, only: [:show] do
     member do
       post :place_pawn
       post :draw_card
@@ -9,7 +9,6 @@ Rails.application.routes.draw do
 
     collection do
       post :start
-      get :joinable
     end
   end
 

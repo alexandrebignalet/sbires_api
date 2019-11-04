@@ -1,0 +1,1 @@
+class EntityNotFound < StandardError; end

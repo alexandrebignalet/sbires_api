@@ -1,23 +1,13 @@
-class GameController < ApplicationController
+# frozen_string_literal: true
+
+class GamesController < ApplicationController
   include Secured
 
   def start
     room_id = params[:waiting_room_id]
-    current_user.waiting_rooms.find_by!(waiting_room_id: room_id)
 
-    room = waiting_room_repository.load(room_id)
-    raise "Cannot start a game with only #{room.user_ids.count} players" unless room.can_start_game?
-
-    players_users = User.where(auth_id: room.user_ids)
-    player_names = players_users.map(&:username)
-
-    command = CreateGame.new(player_names)
-    game = CreateGameHandler.new.call command
-
-    lord_names_by_player_name = game.players.reduce({}) { |acc, p| acc[p.name] = p.lord_name; acc }
-    players_users.each { |user| UserGame.create!(user: user, game_id: game.id, lord_name: lord_names_by_player_name[user.username]) }
-    waiting_room_repository.delete(room_id)
-    current_user.waiting_rooms.find_by(waiting_room_id: room_id).destroy
+    game = Game::Start.new(waiting_room_repository, game_repository)
+                      .call(waiting_room_id: room_id, current_user: current_user)
 
     render json: GameSerializer.new(game, current_user), status: :ok
   end
