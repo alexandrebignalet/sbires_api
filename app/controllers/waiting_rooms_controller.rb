@@ -33,6 +33,16 @@ class WaitingRoomsController < ActionController::API
     render json: WaitingRoomSerializer.new(room), status: :ok
   end
 
+  def start_game
+    id = params[:id]
+
+    start_game = WaitingRoom::StartGameCommand.new(id, current_user.auth_id)
+    response = CommandBus.send(start_game)
+
+    game_id = response.value
+    render status: :created, location: game_url(game_id)
+  end
+
   private
 
   def repository

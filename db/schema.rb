@@ -15,7 +15,6 @@ ActiveRecord::Schema.define(version: 2019_11_02_183046) do
   create_table "user_games", force: :cascade do |t|
     t.integer "user_id"
     t.string "game_id", null: false
-    t.string "lord_name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id", "game_id"], name: "index_user_games_on_user_id_and_game_id", unique: true

@@ -48,4 +48,39 @@ RSpec.describe WaitingRoom do
     creator = User.new(username: 'jean', email: 'Francis', auth_id: 'creator_id')
     expect { wr.join(creator) }.to raise_error BusinessError, "#{creator.username} already in the waiting room"
   end
+
+  it 'should know whether a user is in or not' do
+    wr = WaitingRoom.new(name: 'my waiting room 2', user_ids: %w(creator_id))
+
+    expect(wr.include?('creator_id')).to be true
+    expect(wr.include?('jacque')).to be false
+  end
+
+  describe 'game start' do
+
+    it 'should raise if user starter is not in the waiting room' do
+      user_starter_id = 'foreigner'
+
+      wr = WaitingRoom.new(name: 'my waiting room 2', user_ids: %w(creator_id))
+
+      expect { wr.start_game(user_starter_id) }.to raise_error BusinessError
+    end
+
+    it 'should raise if there is not enough players to start' do
+      user_starter_id = 'creator_id'
+      wr = WaitingRoom.new(name: 'my waiting room 2', user_ids: [user_starter_id])
+
+      expect { wr.start_game(user_starter_id) }.to raise_error BusinessError
+    end
+
+    it 'should return an GameStarted event' do
+      user_starter_id = 'creator_id'
+
+      wr = WaitingRoom.new(name: 'my waiting room 2', user_ids: [user_starter_id, 'julio_id'])
+
+      event = wr.start_game(user_starter_id)
+
+      expect(event.origin_room_id).to eq(wr.id)
+    end
+  end
 end

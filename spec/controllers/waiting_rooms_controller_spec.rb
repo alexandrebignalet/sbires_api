@@ -38,4 +38,23 @@ RSpec.describe WaitingRoomsController, type: :request do
     expect(response.status).to be(204)
   end
 
+  it 'should start a game from a waiting room' do
+    user = create_authenticated_user(username: 'john', email: 'john@example.org', auth_id: 'john_auth_id')
+
+    create_room = WaitingRoom::CreateCommand.new('sbires_room', user)
+    res = CommandBus.send(create_room)
+    room = res.value
+
+    another_user = create_authenticated_user(username: 'jean', email: 'jean@example.org', auth_id: 'jean_auth_id')
+    join_room = WaitingRoom::JoinCommand.new(room.id, another_user)
+    CommandBus.send(join_room)
+
+    game_resource_path = "/waiting_rooms/#{room.id}/start_game"
+
+    post game_resource_path, params: { waiting_room_id: room.id }
+
+    expect(response).to be_successful
+    expect(response.status).to be(201)
+  end
+
 end

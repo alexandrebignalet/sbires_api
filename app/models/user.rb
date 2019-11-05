@@ -10,4 +10,6 @@ class User < ApplicationRecord
 
   has_many :user_waiting_rooms
   has_many :user_games
+
+  scope :usernames_of, ->(user_ids) { where(auth_id: user_ids).map(&:username) }
 end

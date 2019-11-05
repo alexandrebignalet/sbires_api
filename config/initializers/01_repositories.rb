@@ -1,6 +1,6 @@
 REPOSITORIES = [
-    GameRepository,
-    WaitingRoomRepository
+  GameRepository,
+  WaitingRoomRepository
 ].freeze
 
 class RepositoryRegisterer
