@@ -4,10 +4,10 @@ class GamesController < ApplicationController
   include Secured
 
   def start
-    room_id = params[:waiting_room_id]
+    start_game = Game::StartCommand.new(params[:waiting_room_id], current_user)
 
-    game = Game::Start.new(waiting_room_repository, game_repository)
-                      .call(waiting_room_id: room_id, current_user: current_user)
+    response = CommandBus.send(start_game)
+    game = response.value
 
     render json: GameSerializer.new(game, current_user), status: :ok
   end

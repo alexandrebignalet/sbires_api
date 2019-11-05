@@ -5,6 +5,9 @@ class Event::DispatcherMiddleware
 
   def intercept(params, next_middleware)
     result = next_middleware.call
-    @event_bus.publish(result.second)
+
+    @event_bus.publish(result.events)
+
+    result
   end
 end

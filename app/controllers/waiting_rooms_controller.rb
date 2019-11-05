@@ -6,9 +6,11 @@ class WaitingRoomsController < ActionController::API
   def create
     room_name = params[:name]
 
-    waiting_room = WaitingRoom::Create
-                   .new(repository)
-                   .call(name: room_name, user_creator: current_user)
+    command = WaitingRoom::CreateCommand.new(room_name, current_user)
+
+    response = CommandBus.send(command)
+
+    waiting_room = response.value
 
     render json: WaitingRoomSerializer.new(waiting_room), status: :created
   end
@@ -16,8 +18,9 @@ class WaitingRoomsController < ActionController::API
   def join
     waiting_room_id = params[:id]
 
-    WaitingRoom::Join.new(repository).call(waiting_room_id: waiting_room_id,
-                                           user: current_user)
+    join_room = WaitingRoom::JoinCommand.new(waiting_room_id, current_user)
+
+    CommandBus.send(join_room)
 
     head :no_content
   end

@@ -5,9 +5,10 @@ RSpec.describe Game::Create do
     repository = InMemoryRepository.new
 
     player_names = %w[Jean Francois]
-    create_game = Game::Create.new(repository)
+    create_game = Game::CreateCommand.new(player_names)
 
-    game = create_game.call(player_names: player_names)
+    response = Game::Create.new(repository).call(create_game)
+    game = response.value
 
     expect(game).to_not be nil
     created_game = repository.load(game.id)

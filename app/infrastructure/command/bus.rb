@@ -38,20 +38,20 @@ class Command::Bus
   class InvokeUseCase
     def initialize(use_cases)
       @use_cases = use_cases.each_with_object({}) do |cur, acc|
-        acc[cur.listen_to] = cur
+        acc[cur.listen_to.name] = cur
         acc
       end
     end
 
-    def intercept(params, _next_middleware)
-      use_case = @use_cases[params[:listen_to]]
+    def intercept(command, _next_middleware)
+      use_case = @use_cases[command.class.name]
       if use_case.nil?
         raise UseCaseNotFound, 'Use case associated with this command is not handle yet'
       end
 
-      Rails.logger.info "#{use_case.class.name} handled #{params}"
+      Rails.logger.info "#{use_case.class.name} handled #{command}"
 
-      use_case.call(params)
+      use_case.call(command)
     end
   end
 end

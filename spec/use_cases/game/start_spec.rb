@@ -4,26 +4,37 @@ RSpec.describe Game::Start do
   let(:waiting_room_repository) { InMemoryRepository.new }
   let(:game_repository) { InMemoryRepository.new }
   let(:user_room_creator) { User.create!(username: 'john', email: 'john@example.org', auth_id: 'john_auth_id') }
-  let(:room) { WaitingRoom::Create.new(waiting_room_repository).call(name: 'room', user_creator: user_room_creator) }
+
+  let(:room) do
+    create_room = WaitingRoom::CreateCommand.new('room', user_room_creator)
+    response = WaitingRoom::Create.new(waiting_room_repository).call(create_room)
+    response.value
+  end
+
   let(:second_user_room) { User.create!(username: 'jack', email: 'jack@example.org', auth_id: 'jack_auth_id') }
 
 
   it 'should raise if current user not in the waiting room' do
     not_in_room_user = User.create!(username: 'user', email: 'user@example.org', auth_id: 'user_auth_id')
-
-    expect { start_game.call(waiting_room_id: room.id, current_user: not_in_room_user) }.to raise_error ActiveRecord::RecordNotFound
+    start_game = Game::StartCommand.new(room.id, not_in_room_user)
+    expect { do_start_game.call(start_game) }.to raise_error ActiveRecord::RecordNotFound
   end
 
   it 'should raise if game cannot be started due to lack of players in waiting room' do
-    expect { start_game.call(waiting_room_id: room.id, current_user: user_room_creator) }.to raise_error BusinessError
+    start_game = Game::StartCommand.new(room.id, user_room_creator)
+    expect { do_start_game.call(start_game) }.to raise_error BusinessError
   end
 
   describe 'saved a new game' do
     let(:game_repository) { double(add: nil) }
 
     before do
-      WaitingRoom::Join.new(waiting_room_repository).call(waiting_room_id: room.id, user: second_user_room)
-      start_game.call(waiting_room_id: room.id, current_user: user_room_creator)
+      join_room = WaitingRoom::JoinCommand.new(room.id, second_user_room)
+      WaitingRoom::Join.new(waiting_room_repository).call(join_room)
+
+      start_game = Game::StartCommand.new(room.id, user_room_creator)
+      do_start_game.call(start_game)
+
       @saved_game = nil
       expect(game_repository).to have_received(:add) { |arg| @saved_game = arg }
     end
@@ -45,7 +56,7 @@ RSpec.describe Game::Start do
     end
   end
 
-  def start_game
+  def do_start_game
     Game::Start.new(waiting_room_repository, game_repository)
   end
 end

@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe Event::DispatcherMiddleware do
   EVENT_TYPE = 'counted'
-  LISTEN_TO = 'count'
 
   it 'should redirect event from command to event bus' do
     double = double(call: nil)
@@ -15,22 +14,25 @@ RSpec.describe Event::DispatcherMiddleware do
     events = [{ call_params: call_params, type: EVENT_TYPE }, { lala: 'zaza', type: 'OTHER' }]
     command_bus = Command::Bus.new([MockUseCase.new(events)], [event_dispatcher])
 
-    command_bus.send(listen_to: LISTEN_TO)
+    command = MockUseCaseCommand.new
+    command_bus.send(command)
 
     expect(double).to have_received(:call).with(call_params)
   end
 
-  class MockUseCase
+  class MockUseCaseCommand; end
+
+  class MockUseCase < Command::UseCase
     def initialize(events)
       @events = events
     end
 
     def call(params)
-      [params, @events]
+      Command::Response.new(params, @events)
     end
 
     def listen_to
-      LISTEN_TO
+      MockUseCaseCommand
     end
   end
 

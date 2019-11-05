@@ -9,6 +9,7 @@ RSpec.describe WaitingRoomsController, type: :request do
     user = create_authenticated_user(username: 'jean', email: 'jean@example.org', auth_id: 'user_auth_id')
     waiting_room_name = 'waiting_room'
 
+    # create commands object
     post waiting_room_resource_path, params: { name: waiting_room_name }
 
     expect(response).to be_successful
@@ -23,10 +24,12 @@ RSpec.describe WaitingRoomsController, type: :request do
   it 'should allow user to join a waiting room' do
     user = create_authenticated_user(username: 'jean', email: 'jean@example.org', auth_id: 'user_auth_id')
     waiting_room_name = 'waiting_room'
-    repository = Repositories.get('WaitingRoomRepository')
-    a_room = WaitingRoom::Create.new(repository).call(name: waiting_room_name, user_creator: user)
 
-    john_user = create_authenticated_user(username: 'john', email: 'john@example.org', auth_id: 'john_auth_id')
+    command = WaitingRoom::CreateCommand.new(waiting_room_name, user)
+    res = CommandBus.send(command)
+    a_room = res.value
+
+    create_authenticated_user(username: 'john', email: 'john@example.org', auth_id: 'john_auth_id')
 
     waiting_room_resource_path = "/waiting_rooms/#{a_room.id}/join"
     post waiting_room_resource_path

@@ -4,13 +4,13 @@ require 'rails_helper'
 
 RSpec.describe Command::Bus do
   let(:listen_name) { 'TestBus' }
-  let(:use_case_listening) { double(call: nil, listen_to: listen_name) }
-  let(:use_case_not_listening) { double(call: nil, listen_to: "#{listen_name}other") }
+  let(:use_case_listening) { double(call: nil, listen_to: double(name: listen_name)) }
+  let(:use_case_not_listening) { double(call: nil, listen_to: double(name: "#{listen_name}other")) }
 
   it 'should call one the use case which is listening for the command' do
     use_cases = [use_case_listening, use_case_not_listening]
 
-    Command::Bus.new(use_cases, []).send(hello: 'it\'s me', listen_to: listen_name)
+    Command::Bus.new(use_cases, []).send(double(hello: 'it\'s me', class: double(name: listen_name)))
 
     expect(use_case_listening).to have_received(:call)
     expect(use_case_not_listening).to_not have_received(:call)
@@ -21,7 +21,7 @@ RSpec.describe Command::Bus do
   let(:middleware_three) { FakeMiddleware.new }
 
   it 'should call all the middlewares registered' do
-    params = { listen_to: listen_name }
+    params = double(class: double(name: listen_name))
 
     Command::Bus
       .new([use_case_listening], [middleware_one, middleware_two, middleware_three])
