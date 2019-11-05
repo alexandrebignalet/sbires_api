@@ -15,6 +15,8 @@ class WaitingRoom
     raise BusinessError, "Room #{@name} is full" if full?
 
     @user_ids << user.auth_id
+
+    UserJoinedWaitingRoom.new(@id, user.auth_id)
   end
 
   def full?

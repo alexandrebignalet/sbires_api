@@ -19,13 +19,11 @@ class WaitingRoom::Join < Command::UseCase
 
     waiting_room = @repository.load(waiting_room_id)
 
-    waiting_room.join(user)
+    event = waiting_room.join(user)
 
     @repository.add(waiting_room)
 
-    # TODO send events from domain
-    events = [{ user: user, waiting_room_id: waiting_room_id, type: WaitingRoom::OnJoin::EVENT_TYPE }]
-    Command::Response.new(nil, events)
+    Command::Response.new(nil, [event])
   end
 
   def listen_to

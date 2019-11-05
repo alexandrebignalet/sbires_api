@@ -11,7 +11,7 @@ RSpec.describe Event::DispatcherMiddleware do
     event_dispatcher = Event::DispatcherMiddleware.new(event_bus)
 
     call_params = "call_params"
-    events = [{ call_params: call_params, type: EVENT_TYPE }, { lala: 'zaza', type: 'OTHER' }]
+    events = [MockEvent.new(call_params), { lala: 'zaza', type: 'OTHER' }]
     command_bus = Command::Bus.new([MockUseCase.new(events)], [event_dispatcher])
 
     command = MockUseCaseCommand.new
@@ -36,17 +36,25 @@ RSpec.describe Event::DispatcherMiddleware do
     end
   end
 
-  class MockEventCaptor
+  class MockEvent
+    attr_reader :params
+
+    def initialize(params)
+      @params = params
+    end
+  end
+
+  class MockEventCaptor < Event::Captor
     def initialize(double)
       @double = double
     end
 
     def call(event)
-      @double.call(event[:call_params])
+      @double.call(event.params)
     end
 
     def event_type
-      EVENT_TYPE
+      MockEvent
     end
   end
 end

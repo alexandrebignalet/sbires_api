@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-class WaitingRoom::OnJoin
-  EVENT_TYPE = 'on_waiting_room_joined'
+class WaitingRoom::OnJoin < Event::Captor
 
   def call(event)
-    UserWaitingRoom.create!(user: event[:user], waiting_room_id: event[:waiting_room_id])
+    user = User.find_by(auth_id: event.user_auth_id)
+    UserWaitingRoom.create!(user: user, waiting_room_id: event.waiting_room_id)
   end
 
   def event_type
-    EVENT_TYPE
+    UserJoinedWaitingRoom
   end
 end

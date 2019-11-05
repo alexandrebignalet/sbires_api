@@ -13,7 +13,7 @@ class Event::Bus
 
   def execute(event)
     @captors
-      .select { |c| c.event_type == event[:type] }
+      .select { |c| c.event_type.name == event.class.name }
       .map { |c| c.call(event) }
   end
 end

@@ -27,7 +27,7 @@ RSpec.describe WaitingRoom::Create do
   it 'should return on waiting room joined event' do
     events = @res.events
 
-    expect(events.first[:user]).to eq(join_user)
-    expect(events.first[:waiting_room_id]).to eq(@room.id)
+    expect(events.first.user_auth_id).to eq(join_user.auth_id)
+    expect(events.first.waiting_room_id).to eq(@room.id)
   end
 end
