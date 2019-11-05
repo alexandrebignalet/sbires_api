@@ -14,12 +14,11 @@ class WaitingRoom::Create < Command::UseCase
   end
 
   def call(command)
-    room = WaitingRoom.new(name: command.name, user_ids: [command.user_creator.auth_id])
+    room, event = WaitingRoom.of(name: command.name, creator_id: command.user_creator.auth_id)
 
     @repository.add(room)
-    UserWaitingRoom.create!(user: command.user_creator, waiting_room_id: room.id)
 
-    Command::Response.new(room)
+    Command::Response.new(room, [event])
   end
 
   def listen_to

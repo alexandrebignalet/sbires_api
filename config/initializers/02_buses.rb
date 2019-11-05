@@ -8,7 +8,9 @@ user_service = User
 event_captors = [
     WaitingRoom::OnJoin.new,
 
+    User::OnWaitingRoomCreated.new,
     User::OnGameStarted.new,
+
     Game::OnGameStarted.new(game_repository, user_service)
 ]
 

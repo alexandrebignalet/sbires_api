@@ -1,6 +1,11 @@
 class WaitingRoom
   attr_reader :id, :name, :user_ids
 
+  def self.of(name:, creator_id:)
+    room = WaitingRoom.new(name: name, user_ids: [creator_id])
+    [room, WaitingRoomCreated.new(room.id, creator_id)]
+  end
+
   def initialize(id: nil, name:, user_ids:)
     raise BusinessError, 'Name required' if name.blank?
     raise BusinessError, 'The creator must join the room' if user_ids.empty?
