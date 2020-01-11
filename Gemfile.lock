@@ -1,5 +1,6 @@
-PATH
-  remote: ../sbires_core
+GIT
+  remote: git://github.com/alexandrebignalet/sbires.git
+  revision: f68beb961d24aae708d6288114b61292e1f2a4e8
   specs:
     sbires (0.1.0)
 
