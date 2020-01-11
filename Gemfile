@@ -15,6 +15,7 @@ gem 'jwt'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rack-cors','>= 1.0.4'
 gem 'httparty'
+gem "rack", ">= 2.0.8"
 
 group :development, :test do
   gem 'pry-byebug'
