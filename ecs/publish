@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+##? Create, tag and push a Docker image
+##?
+##? Usage: publish --tag <name>
+##?
+##? Options:
+##?   --tag <name>   Docker image tag
+
+help=$(grep "^##?" "$0" | cut -c 5-)
+eval "$(docopts -h "$help" : "$@")"
+
+declare tag
+
+# Build Docker image
+docker_image="096040694364.dkr.ecr.eu-west-1.amazonaws.com/sbires:${tag}"
+docker pull "${docker_image}" 2>/dev/null || true
+docker build -t "${docker_image}" .
+
+# Push Docker image to ECR
+docker push "${docker_image}"

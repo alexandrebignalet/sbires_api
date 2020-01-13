@@ -9,7 +9,7 @@ gem 'puma', '>= 3.12.2'
 
 gem 'bootsnap', '>= 1.1.0', require: false
 
-gem 'sbires', git: 'git://github.com/alexandrebignalet/sbires.git'
+gem 'sbires', git: 'https://github.com/alexandrebignalet/sbires.git'
 
 gem 'jwt'
 gem 'bcrypt', '~> 3.1.7'
