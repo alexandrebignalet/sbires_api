@@ -3,11 +3,12 @@
 tag=$1
 
 # install aws cli
+pip install --user --upgrade pip
 pip install --user awscli
 export PATH=$PATH:$HOME/.local/bin
 
 # login ecr
-eval $(aws ecr get-login --region eu-west-1)
+eval $(aws ecr get-login --region eu-west-1 --no-include-email)
 
 # Build Docker image
 docker_image="096040694364.dkr.ecr.eu-west-1.amazonaws.com/sbires:${tag}"
