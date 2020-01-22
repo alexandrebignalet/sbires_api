@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Example:
+#    ./check-image-exists.sh docker_image
+
+if [[ $# -lt 1 ]]; then
+    echo "Usage: $( basename $0 ) <docker_image>"
+    exit 1
+fi
+docker_image=$1
+repo_image=$(cut -d'/' -f2 <<<"$docker_image")
+repo=$(cut -d':' -f1 <<<"$repo_image")
+image_tag=$(cut -d':' -f2 <<<"$repo_image")
+
+IMAGE_META="$( aws ecr describe-images --repository-name=$repo --image-ids=imageTag=$image_tag 2> /dev/null )"
+
+if [[ $? == 0 ]]; then
+    IMAGE_TAGS="$( echo ${IMAGE_META} | jq '.imageDetails[0].imageTags[0]' -r )"
+    echo "$repo:$image_tag found"
+else
+    echo "$repo:$image_tag not found"
+    exit 1
+fi

@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+##? Re-tag an existing Docker image
+##?
+##? Usage: retag-docker-image --image <name> --tag <value>
+##?
+##? Options:
+##?   --image <name>   Name of the Docker image (with previous tag)
+##?   --tag <value>    New tag
+
+
+image=$1
+tag=$2
+
+echo "Retagging image ${image} as <${tag}>"
+base_name="${image%:*}"
+docker pull "${image}"
+docker tag "${image}" "${base_name}:${tag}"
+docker push "${base_name}:${tag}"
+
+echo "Retagged successfully"

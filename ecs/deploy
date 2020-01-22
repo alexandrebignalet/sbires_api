@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+tag=$1
+env=$2
+
+pip install ecs-deploy
+pip install -r ./ecs/requirements.txt
+export PATH="./ecs/scripts:$PATH" # TODO REMOVE THIS IN PATH
+
+eval $(aws ecr get-login --region eu-west-1 --no-include-email)
+
+echo "Deploying ${tag} to ${env}"
+
+# Update the main service
+update-ecs-service \
+  "${env}" \
+  "sbires-service" \
+  "ecs/service.json" \
+  "ecs/values/${env}.yaml" \
+  "docker_tag=${tag}"

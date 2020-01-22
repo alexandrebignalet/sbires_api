@@ -1,0 +1,49 @@
+#!/bin/bash -e
+
+##? Update an existing ECS service with a task definition
+##?
+##? Usage: update-ecs-service --env <name> --service <name> --template <path> [--values-file <path>] [--values <string>]
+##?
+##? Options:
+##?   --env <name>           Name of the environment (prod, staging...)
+##?   --service <name>       Name of the service in ECS
+##?   --template <path>      File to render, using {{key}} placeholders
+##?   --values-file <path>   YAML file with values for the template
+##?   --values <string>      Inline values as "Key=Value,Key=Value"
+
+env=$1
+service=$2
+template=$3
+values_file=$4
+values=$5
+
+# init
+aws_region="eu-west-1"
+task_path=$(mktemp)
+service_timeout="300"
+
+# render task template
+render-template --template "${template}" --values-file "${values_file}" --values "${values}" > "${task_path}"
+docker_image=$(jq -r '.containerDefinitions[].image' < "${task_path}")
+echo "Rendered ECS task template ${task_path}"
+echo "Using docker image ${docker_image}"
+
+# verify that the docker image exists in ECR
+check-image-exists "${docker_image}"
+
+# register new task definition
+echo "Registering new task definition"
+task_def=$(aws ecs register-task-definition --cli-input-json "file://${task_path}" --region "${aws_region}")
+task_arn=$(echo "${task_def}" | jq -r '.taskDefinition.taskDefinitionArn')
+echo "Created task ${task_arn}"
+
+# deploy the service
+# !! unfortunately this creates a new task revision: https://github.com/fabfuel/ecs-deploy/issues/109
+# !! it doesn't cause any problems but it's not useful and looks strange in the logs
+echo "Deploying service ${service} to ${env}"
+ecs deploy "sbires-services-${env}" "${service}" --task "${task_arn}" --region "${aws_region}" --timeout "${service_timeout}"
+
+# retag the docker image with the environment name
+retag-docker-image "${docker_image}" "${env}"
+
+echo "Service deployed successfully"

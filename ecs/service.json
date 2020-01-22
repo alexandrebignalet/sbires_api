@@ -1,0 +1,32 @@
+{
+  "family": "sbires-service-{{ environment }}",
+  "taskRoleArn": "sbires-service-task-role-{{ environment }}",
+  "executionRoleArn": "sbires-service-task-role-{{ environment }}",
+  "requiresCompatibilities": ["EC2"],
+  "networkMode": "bridge",
+  "containerDefinitions": [{
+    "name": "server",
+    "image": "096040694364.dkr.ecr.eu-west-1.amazonaws.com/sbires:{{ docker_tag }}",
+    "memoryReservation": 512,
+    "environment" : [
+      { "name" : "PORT", "value" : "8080" },
+      { "name" : "RACK_ENV", "value" : "production" },
+      { "name" : "RAILS_ENV", "value" : "production" },
+      { "name" : "ENVIRONMENT", "value" : "{{ environment }}" },
+      { "name" : "RAILS_LOG_TO_STDOUT", "value" : "true" },
+      { "name" : "RAILS_SERVE_STATIC_FILES", "value" : "enabled" },
+      { "name" : "TZ", "value" : "Europe/Paris" }
+    ],
+    "portMappings": [
+      { "containerPort": 8080 }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "sbires-service-{{ environment }}",
+        "awslogs-region": "{{ aws_region }}",
+        "awslogs-stream-prefix": "{{ environment }}"
+      }
+    }
+  }]
+}

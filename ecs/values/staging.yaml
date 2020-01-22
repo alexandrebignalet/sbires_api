@@ -1,0 +1,4 @@
+aws_region: eu-west-1
+environment: staging
+docker_tag: staging
+new_relic_agent_enabled: false

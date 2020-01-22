@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+
+## --------------------------------------------------------
+##
+## Render a Jinga template with placeholder values
+##
+## Required:
+##   --template <path>      File to render, using {{key}} placeholders
+##
+## Optional:
+##   --values-file <path>   YAML file with values for the template
+##   --values <string>      Inline values as "Key=Value,Key=Value"
+##
+## --------------------------------------------------------
+
+import argparse
+import jinja2
+import os
+import sys
+import tempfile
+import yaml
+from pathlib import Path
+
+def make_values_dict(values_file, values_string):
+  values = {}
+  # start with the YAML file if it exists
+  if values_file:
+    with open(values_file, 'r') as stream:
+      values = yaml.safe_load(stream)
+  # add any additional values
+  if values_string:
+    for v in values_string.split(','):
+      key, value = v.split('=')
+      values[key] = value
+  # return the full dict
+  return values
+
+# parse command line args
+parser = argparse.ArgumentParser(description='Optional app description')
+parser.add_argument('--template', type=str, required=True, help='Path to the task definition template')
+parser.add_argument('--values-file', type=str, required=False, help='Path to values for the template')
+parser.add_argument('--values', type=str, required=False, help='Comma separated values for the template')
+args = parser.parse_args()
+
+# render template
+values = make_values_dict(args.values_file, args.values)
+contents = Path(args.template).read_text()
+try:
+  template = jinja2.Template(contents, undefined=jinja2.StrictUndefined)
+  rendered = template.render(values)
+  print(rendered)
+except Exception as ex:
+  print("Failed to render the template " + args.template, file=sys.stderr)
+  print(ex, file=sys.stderr)
+  exit(1)
